@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kibana-dashboard
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    # traefik.frontend.rule.type: PathPrefixStrip
+spec:
+  rules:
+  - host: localhost # traefik-ingress-host
+    http:
+      paths:
+      - path: /kibana
+        backend:
+          serviceName: kibana
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-dashboard
+  namespace: ingress-traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefixStrip
+spec:
+  rules:
+  - host: localhost # traefik-ingress-host
+    http:
+      paths:
+      - path: /traefik
+        backend:
+          serviceName: traefik-ingress-service
+          servicePort: 8080

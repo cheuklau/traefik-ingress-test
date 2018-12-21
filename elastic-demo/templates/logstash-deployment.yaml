@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.logstash.name }}
+spec:
+  replicas: {{ .Values.logstash.replicas }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.logstash.name }}
+    spec:
+      containers:
+      - env:
+        #- name: ES_JAVA_OPTS
+        #  value: -Xms256m -Xms256m
+        name: {{ .Values.logstash.name }}
+        image: "{{ .Values.logstash.image.repository }}:{{ .Values.logstash.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.logstash.port }}

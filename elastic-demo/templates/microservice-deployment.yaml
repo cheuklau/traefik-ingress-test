@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservice.name }}
+spec:
+  replicas: {{ .Values.microservice.replicas }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.microservice.name }}
+    spec:
+      containers:
+      - name: {{ .Values.microservice.name }}
+        image: "{{ .Values.microservice.image.repository }}:{{ .Values.microservice.image.tag }}"
+        env:
+        # Time in seconds between log generation
+        - name: WAIT_TIME
+          value: '{{ .Values.microservice.env.waitTime }}'
+        # Percent chance of WARN log
+        - name: PER_WARN
+          value: '{{ .Values.microservice.env.perWarn }}'
+        # Percent chance of ERROR log
+        - name: PER_ERR
+          value: '{{ .Values.microservice.env.perErr }}'
+        volumeMounts:
+        - name: log-dir
+          mountPath: /logtest
+      # Side-car for Filebeat
+      - name: {{ .Values.filebeat.name }}
+        image: "{{ .Values.filebeat.image.repository }}:{{ .Values.filebeat.image.tag }}"
+        volumeMounts:
+        - name: log-dir
+          mountPath: /logtest
+      # Temporary directory that shares a pod's lifetime
+      volumes:
+      - name: log-dir
+        emptyDir: {}

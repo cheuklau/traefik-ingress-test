@@ -1,0 +1,76 @@
+microservice:
+  # Container name
+  name: microservice
+  # Replicas
+  replicas: 1
+  # Image
+  image:
+    repository: cheuklau/microservice
+    tag: latest
+    pullPolicy: IfNotPresent
+  # Environment variables
+  env:
+    waitTime: 5
+    perWarn: 10
+    perErr: 5
+
+# Note: Filebeat is mounted as a sidecar to microservice within the same pod
+filebeat:
+  # Container name
+  name: filebeat
+  # Image
+  image:
+    repository: cheuklau/filebeat
+    tag: latest
+    pullPolicy: IfNotPresent
+
+logstash:
+  # Container name
+  name: logstash
+  # Replicas
+  replicas: 1
+  # Image
+  image:
+    repository: cheuklau/logstash
+    tag: latest
+    pullPolicy: IfNotPresent
+  # Ports
+  port: 5044
+  targetPort: 5044
+
+elasticsearch:
+  # Container name
+  name: elasticsearch
+  # Replicas
+  replicas: 1
+  # Image
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    tag: latest
+    pullPolicy: IfNotPresent
+  # Ports
+  port: 9200
+  targetPort: 9200
+  containerPort: 9200
+
+busybox:
+  # Image 
+  image:
+    repository: busybox
+    tag: latest
+    pullPolicy: IfNotPresent
+
+kibana:
+  # Container name
+  name: kibana
+  # Replicas
+  replicas: 1
+  # Image:
+  image:
+    repository: docker.elastic.co/kibana/kibana:6.4.2
+    tag: latest
+    pullPolicy: IfNotPresent
+  # Ports
+  port: 80
+  targetPort: 5601
+  containerPort: 5601

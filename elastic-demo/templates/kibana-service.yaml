@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.kibana.name }}
+  labels:
+    name: {{ .Values.kibana.name }}
+spec:
+  ports:
+  - name: {{ .Values.kibana.name }}
+    port:  {{ .Values.kibana.port }}
+    targetPort:  {{ .Values.kibana.targetPort }}
+  selector:
+    name: {{ .Values.kibana.name }}

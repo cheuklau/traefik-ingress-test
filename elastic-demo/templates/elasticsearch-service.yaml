@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.elasticsearch.name }}
+  labels:
+    name: {{ .Values.elasticsearch.name }}
+spec:
+  ports:
+  - name: {{ .Values.elasticsearch.name }}
+    port: {{ .Values.elasticsearch.port }}
+    targetPort: {{ .Values.elasticsearch.targetPort }}
+  selector:
+    name: {{ .Values.elasticsearch.name }}
