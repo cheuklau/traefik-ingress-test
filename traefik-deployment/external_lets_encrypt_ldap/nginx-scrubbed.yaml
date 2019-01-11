@@ -1,0 +1,18 @@
+web: 0.0.0.0:5555
+path: /
+servers:
+- ldap://<ldap-server-address>
+auth:
+  bindDN: <manager-credentials>
+  bindPW: <manager-password>
+user:
+  baseDN: DC=example,DC=com
+  filter: (&(objectclass=user)(objectcategory=person)(|(CN={0})(samaccountname={0})))
+  requiredGroups:
+group:
+  baseDN: DC=bosch,DC=com
+  groupAttr: memberOf
+  filter: (& ((samaccountname={0}) (objectclass=group)))
+timeout:
+  success: 24h
+  wrong: 5m

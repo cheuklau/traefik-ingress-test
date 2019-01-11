@@ -1,0 +1,109 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: traefik-ingress-controller
+  namespace: ingress-traefik
+  labels:
+    k8s-app: traefik-ingress-lb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: traefik-ingress-lb
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-ingress-lb
+        name: traefik-ingress-lb
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: config
+          configMap:
+            name: traefik-conf
+        - name: acme
+          persistentVolumeClaim:
+            claimName: pv-test-claim
+        - name: dns-config
+          secret:
+            secretName: dns-secret
+      containers:
+      - image: traefik:latest
+        name: traefik-ingress-lb
+        volumeMounts:
+          - mountPath: "/config"
+            name: "config"
+          - mountPath: "/acme"
+            name: "acme"
+          - mountPath: "/dns-config"
+            name: "dns-config"
+            readOnly: true
+        env:
+        - name: HTTP_PROXY
+          valueFrom:
+            secretKeyRef:
+              name: proxy-secret
+              key: proxy
+        - name: HTTPS_PROXY
+          valueFrom:
+            secretKeyRef:
+              name: proxy-secret
+              key: proxy
+        - name: http_proxy
+          valueFrom:
+            secretKeyRef:
+              name: proxy-secret
+              key: proxy
+        - name: https_proxy
+          valueFrom:
+            secretKeyRef:
+              name: proxy-secret
+              key: proxy
+        - name: GCE_PROJECT
+          valueFrom:
+            secretKeyRef:
+              name: dns-env-secret
+              key: GCE_PROJECT
+        - name: GCE_SERVICE_ACCOUNT_FILE
+          valueFrom:
+            secretKeyRef:
+              name: dns-env-secret
+              key: GCE_SERVICE_ACCOUNT_FILE
+        ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+        - name: admin
+          containerPort: 8080
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+        args:
+        - --configfile=/config/traefik.toml
+        - --api
+        - --kubernetes
+        - --logLevel=DEBUG
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-ingress-service
+  namespace: ingress-traefik
+spec:
+  selector:
+    k8s-app: traefik-ingress-lb
+  ports:
+    - protocol: TCP
+      port: 80
+      name: web
+    - protocol: TCP
+      port: 443
+      name: web-secure
+    - protocol: TCP
+      port: 8080
+      name: admin

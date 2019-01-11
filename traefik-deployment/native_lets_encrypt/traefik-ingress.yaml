@@ -8,7 +8,7 @@ metadata:
     # traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
-  - host: localhost # traefik-ingress-host
+  - host: <host-name>
     http:
       paths:
       - path: /kibana
@@ -26,7 +26,7 @@ metadata:
     traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
-  - host: localhost # traefik-ingress-host
+  - host: <host-name>
     http:
       paths:
       - path: /traefik
